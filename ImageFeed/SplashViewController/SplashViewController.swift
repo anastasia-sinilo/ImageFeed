@@ -3,7 +3,7 @@ import UIKit
 final class SplashViewController: UIViewController {
     private let storage = OAuth2TokenStorage()
     private let showAuthScreenSegueId = "ShowAuthScreen"
-
+    
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         setNeedsStatusBarAppearanceUpdate()
@@ -14,7 +14,7 @@ final class SplashViewController: UIViewController {
         
         //ТОЛЬКО ДЛЯ ТЕСТА: очистка токена
         //UserDefaults.standard.removeObject(forKey: "OAuthToken")
-
+        
         if storage.token != nil {
             switchToTabBarController()
         } else {
@@ -35,7 +35,6 @@ final class SplashViewController: UIViewController {
 
 extension SplashViewController: AuthViewControllerDelegate {
     func didAuthenticate(_ vc: AuthViewController) {
-        //vc.dismiss(animated: true)
         switchToTabBarController()
     }
 }
