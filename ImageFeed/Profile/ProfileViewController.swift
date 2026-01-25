@@ -2,6 +2,12 @@ import UIKit
 
 final class ProfileViewController: UIViewController {
     
+    private enum Constants {
+        static let nameText = "Екатерина Новикова"
+        static let loginText = "@ekaterina_nov"
+        static let descriptionText = "Hello, world!"
+    }
+    
     //MARK: - UI Elements
     
     private let profileImage = UIImageView()
@@ -34,7 +40,7 @@ final class ProfileViewController: UIViewController {
     }
     
     private func setupNameLabel() {
-        nameLabel.text = "Екатерина Новикова"
+        nameLabel.text = Constants.nameText
         nameLabel.textColor = UIColor(resource: .white)
         nameLabel.font = .systemFont(ofSize: 23, weight: .bold)
         nameLabel.translatesAutoresizingMaskIntoConstraints = false
@@ -42,7 +48,7 @@ final class ProfileViewController: UIViewController {
     }
     
     private func setupLoginLabel() {
-        loginLabel.text = "@ekaterina_nov"
+        loginLabel.text = Constants.loginText
         loginLabel.textColor = UIColor(resource: .gray)
         loginLabel.font = .systemFont(ofSize: 13, weight: .regular)
         loginLabel.translatesAutoresizingMaskIntoConstraints = false
@@ -50,7 +56,7 @@ final class ProfileViewController: UIViewController {
     }
     
     private func setupDescriptionLabel() {
-        descriptionLabel.text = "Hello, world!"
+        descriptionLabel.text = Constants.descriptionText
         descriptionLabel.textColor = UIColor(resource: .white)
         descriptionLabel.font = .systemFont(ofSize: 13, weight: .regular)
         descriptionLabel.translatesAutoresizingMaskIntoConstraints = false
