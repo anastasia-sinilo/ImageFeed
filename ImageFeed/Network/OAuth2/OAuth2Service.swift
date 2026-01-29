@@ -1,10 +1,30 @@
 import Foundation
 
 final class OAuth2Service {
+    
+    //MARK: - Singleton
+    
     static let shared = OAuth2Service()
     private init() { }
     
+    //MARK: - Properties
+    
+    private var task: URLSessionTask?
+    private var lastCode: String?
+    
+    //MARK: - API
+    
     func fetchOAuthToken(_ code: String, completion: @escaping (Result<String, Error>) -> Void) {
+        assert(Thread.isMainThread)
+        
+        if let task, lastCode == code {
+            completion(.failure(NetworkError.invalidRequest))
+            return
+        }
+        if task != nil, lastCode != code {
+            task?.cancel()
+        }
+        lastCode = code
         
         guard let request = makeOAuthTokenRequest(code: code) else {
             print("OAuth2Service: Failed to build OAuth token request")
@@ -12,29 +32,29 @@ final class OAuth2Service {
             return
         }
         
-        let task = URLSession.shared.data(for: request) { result in
+        let task = URLSession.shared.objectTask(for: request) { [weak self] (result: Result<OAuthTokenResponseBody, Error>) in
+           // UIBlockingProgressHUD.dismiss()
+            guard let self else { return }
+            self.task = nil
+            self.lastCode = nil
             switch result {
-            case .success(let data):
-                do {
-                    let decoder = JSONDecoder()
-                    let response = try decoder.decode(OAuthTokenResponseBody.self, from: data)
-                    let token = response.accessToken
-                    OAuth2TokenStorage.shared.token = token
-                    completion(.success(token))
-                } catch {
-                    print("OAuth2Service decoding error:", error)
-                    completion(.failure(NetworkError.decodingError(error)))
-                }
+            case .success(let response):
+                let token = response.accessToken
+                OAuth2TokenStorage.shared.token = token
+                completion(.success(token))
             case .failure(let error):
-                print("OAuth2Service network error:", error)
+                print("[OAuth2Service.fetchOAuthToken]: \(error.localizedDescription), code: \(code)")
                 completion(.failure(error))
             }
+            
         }
+        self.task = task
         task.resume()
     }
     
+    //MARK: - Request Builder
+    
     private func makeOAuthTokenRequest(code: String) -> URLRequest? {
-        
         guard var urlComponents = URLComponents(string: "https://unsplash.com/oauth/token") else {
             return nil
         }
