@@ -33,7 +33,6 @@ final class OAuth2Service {
         }
         
         let task = URLSession.shared.objectTask(for: request) { [weak self] (result: Result<OAuthTokenResponseBody, Error>) in
-           // UIBlockingProgressHUD.dismiss()
             guard let self else { return }
             self.task = nil
             self.lastCode = nil
@@ -46,7 +45,6 @@ final class OAuth2Service {
                 print("[OAuth2Service.fetchOAuthToken]: \(error.localizedDescription), code: \(code)")
                 completion(.failure(error))
             }
-            
         }
         self.task = task
         task.resume()

@@ -108,7 +108,28 @@ final class ProfileViewController: UIViewController {
     
     @objc
     private func didTapLogoutButton(){
-        print("Logout Button tapped")
+        let alert = UIAlertController(
+            title: "Подтверждение выхода",
+            message: "Уверены, что хотите выйти?",
+            preferredStyle: .alert
+        )
+        
+        let yesAction = UIAlertAction(title: "Да", style: .destructive) { [weak self] _ in
+            guard let self else { return }
+            
+            ProfileLogoutService.shared.logout()
+            
+            guard let window = UIApplication.shared.windows.first else { return }
+            window.rootViewController = SplashViewController()
+            window.makeKeyAndVisible()
+        }
+        let noAction = UIAlertAction(title: "Нет", style: .cancel)
+        
+        alert.addAction(noAction)
+        alert.addAction(yesAction)
+        
+        present(alert, animated: true)
+        
     }
     
     //MARK: - Setup Constraints

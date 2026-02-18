@@ -7,6 +7,7 @@ struct Photo {
     let welcomeDescription: String?
     let thumbImageURL: String
     let largeImageURL: String
+    let smallImageURL: String
     let isLiked: Bool
 }
 
@@ -19,6 +20,8 @@ extension Photo {
         self.welcomeDescription = photoResult.description
         self.thumbImageURL = photoResult.urls.thumb
         self.largeImageURL = photoResult.urls.full
+        self.smallImageURL = photoResult.urls.small
+        
         self.isLiked = photoResult.likedByUser
     }
 }

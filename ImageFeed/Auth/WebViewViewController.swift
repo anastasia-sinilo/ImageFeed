@@ -14,6 +14,8 @@ protocol WebViewViewControllerDelegate: AnyObject {
     func webViewViewControllerDidCancel(_ vc: WebViewViewController)
 }
 
+//MARK: -
+
 final class WebViewViewController: UIViewController {
     
     //MARK: - IBOutlets
@@ -31,23 +33,12 @@ final class WebViewViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        //ТОЛЬКО ДЛЯ ТЕСТА: очистка данных авторизации
-        /*
-         let dataStore = WKWebsiteDataStore.default()
-             dataStore.fetchDataRecords(ofTypes: WKWebsiteDataStore.allWebsiteDataTypes()) { records in
-                 records.forEach { record in
-                     dataStore.removeData(ofTypes: record.dataTypes, for: [record], completionHandler: {
-                         print("Cleared WebView data for:", record.displayName)
-                     })
-                 }
-             }
-        */
         loadAuthView()
         estimatedProgressObservation = webView.observe(
             \.estimatedProgress,
              options: [],
              changeHandler: { [weak self] _, _ in
-                 guard let self = self else { return }
+                 guard let self else { return }
                  self.updateProgress()
              })
         

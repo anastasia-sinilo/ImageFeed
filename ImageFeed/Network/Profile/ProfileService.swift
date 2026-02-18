@@ -7,7 +7,7 @@ struct ProfileResult: Codable {
     let firstName: String
     let lastName: String
     let bio: String?
-
+    
     private enum CodingKeys: String, CodingKey {
         case username
         case firstName = "first_name"
@@ -50,7 +50,6 @@ final class ProfileService {
         }
         
         let task = URLSession.shared.objectTask(for: request) { [weak self] (result: Result<ProfileResult, Error>) in
-            //DispatchQueue.main.async {
             switch result {
             case .success(let profileResult):
                 let profile = Profile(
@@ -70,17 +69,27 @@ final class ProfileService {
         self.task = task
         task.resume()
     }
-
+    
     //MARK: - Request Builder
     
     private func makeProfileRequest(token: String) -> URLRequest? {
         guard let url = URL(string: "https://api.unsplash.com/me") else {
             return nil
         }
-
+        
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
         request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         return request
+    }
+}
+
+//MARK: -
+
+extension ProfileService {
+    func clean() {
+        profile = nil
+        task?.cancel()
+        task = nil
     }
 }

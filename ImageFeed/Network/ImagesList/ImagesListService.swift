@@ -1,79 +1,152 @@
 import Foundation
 
-
 final class ImagesListService {
+    
+    //MARK: - Singleton
     static let shared = ImagesListService()
     private init() {}
     
-    private(set) var photos: [Photo] = []
-    
-    private var lastLoadedPage: Int?
-    private var task: URLSessionTask?
+    //MARK: - Notifications
     
     static let didChangeNotification = Notification.Name(rawValue: "ImagesListServiceDidChange")
-    // ...
+    
+    //MARK: - Properties
+    
+    private(set) var photos: [Photo] = []
+    
+    private var currentPage = 1
+    private var isFetching = false
+    private var task: URLSessionTask?
+    
+    //MARK: - API and Request Builders
     
     func fetchPhotosNextPage() {
         assert(Thread.isMainThread)
         
-        if task != nil {
-            return
-        }
+        guard !isFetching else { return }
         
-        let nextPage = (lastLoadedPage/*?.number*/ ?? 0) + 1
-        guard let request = makePhotosRequest(page: nextPage) else {
-            return
-        }
+        guard let request = makePhotosRequest(page: currentPage) else { return }
+        isFetching = true
         
-        let task = URLSession.shared.objectTask(for: request) { [weak self] (result: Result<[PhotoResult], Error>) in
+        task = URLSession.shared.objectTask(for: request) { [weak self] (result: Result<[PhotoResult], Error>) in
             guard let self else { return }
             self.task = nil
+            self.isFetching = false
             
             switch result {
             case .success(let photoResults):
                 let newPhotos = photoResults.map { Photo(from: $0) }
-                
-                self.photos.append(contentsOf: newPhotos)
-                self.lastLoadedPage = nextPage
-                
-                NotificationCenter.default.post(
-                    name: ImagesListService.didChangeNotification,
-                    object: self
-                )
-                
+                DispatchQueue.main.async {
+                    self.photos.append(contentsOf: newPhotos)
+                    self.currentPage += 1
+                    
+                    NotificationCenter.default.post(
+                        name: ImagesListService.didChangeNotification,
+                        object: self
+                    )
+                }
             case .failure(let error):
                 print("[ImagesListService.fetchPhotosNextPage]: \(error)")
             }
         }
-        
-        self.task = task
-        task.resume()
-        
+        task?.resume()
     }
+    
     private func makePhotosRequest(page: Int) -> URLRequest? {
-        guard var urlComponents = URLComponents(string: "\(Constants.defaultBaseURL)/photos") else {
-            return nil
-        }
+        guard let baseURL = Constants.defaultBaseURL else { return nil }
         
-        urlComponents.queryItems = [
+        var urlComponents = URLComponents(url: baseURL.appendingPathComponent("photos"), resolvingAgainstBaseURL: true)
+        urlComponents?.queryItems = [
             URLQueryItem(name: "page", value: "\(page)"),
             URLQueryItem(name: "per_page", value: "10")
         ]
         
-        guard let url = urlComponents.url else {
-            return nil
-        }
-        
-        var request = URLRequest(url: url)
-        request.httpMethod = "GET"
+        guard let url = urlComponents?.url else { return nil }
         
         guard let token = OAuth2TokenStorage.shared.token else {
             print("[ImagesListService.makePhotosRequest]: no token")
             return nil
         }
         
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
         request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         return request
     }
 }
 
+extension ImagesListService {
+    func changeLike(photoId: String, isLike: Bool, _ completion: @escaping (Result<Void, Error>) -> Void) {
+        guard let request = makeLikeRequest(photoId: photoId, isLike: isLike) else {
+            completion(.failure(NetworkError.invalidRequest))
+            return
+        }
+        let task = URLSession.shared.objectTask(for: request) { [weak self] (result: Result<LikePhotoResult, Error>) in
+            guard let self else { return }
+            
+            switch result {
+            case .success:
+                DispatchQueue.main.async {
+                    if let index = self.photos.firstIndex(where: { $0.id == photoId }) {
+                        let photo = self.photos[index]
+                        
+                        let newPhoto = Photo(
+                            id: photo.id,
+                            size: photo.size,
+                            createdAt: photo.createdAt,
+                            welcomeDescription: photo.welcomeDescription,
+                            thumbImageURL: photo.thumbImageURL,
+                            largeImageURL: photo.largeImageURL,
+                            smallImageURL: photo.smallImageURL,
+                            
+                            isLiked: !photo.isLiked
+                        )
+                        self.photos[index] = newPhoto
+                        
+                        NotificationCenter.default.post(
+                            name: ImagesListService.didChangeNotification,
+                            object: self
+                        )
+                    }
+                    completion(.success(()))
+                }
+            case .failure(let error):
+                DispatchQueue.main.async {
+                    completion(.failure(error))
+                }
+            }
+        }
+        task.resume()
+    }
+    
+    private func makeLikeRequest(photoId: String, isLike: Bool) -> URLRequest? {
+        guard let baseURL = Constants.defaultBaseURL else { return nil }
+        
+        let url = baseURL
+            .appendingPathComponent("photos")
+            .appendingPathComponent(photoId)
+            .appendingPathComponent("like")
+        
+        guard let token = OAuth2TokenStorage.shared.token else {
+            print("[ImagesListService.makeLikeRequest]: no token")
+            return nil
+        }
+        var request = URLRequest(url: url)
+        request.httpMethod = isLike ? "POST" : "DELETE"
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        
+        return request
+    }
+
+    func clean() {
+        photos = []
+        currentPage = 1
+        task?.cancel()
+        task = nil
+        isFetching = false
+    }
+}
+
+private struct LikePhotoResult: Decodable {
+    let photo: PhotoResult
+}

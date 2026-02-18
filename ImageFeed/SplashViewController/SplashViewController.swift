@@ -1,15 +1,12 @@
 import UIKit
 
 final class SplashViewController: UIViewController {
+    private let showAuthScreenSegueId = "ShowAuthScreen"
     
     //MARK: - Dependencies
     
     private let storage = OAuth2TokenStorage.shared
     private let profileService = ProfileService.shared
-    
-    //MARK: - Navigation
-    
-    private let showAuthScreenSegueId = "ShowAuthScreen"
     
     //MARK: - UI Elements
     
@@ -24,11 +21,8 @@ final class SplashViewController: UIViewController {
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        
         setupImageView()
         checkAuthenticationState()
-        //ТОЛЬКО ДЛЯ ТЕСТА: очистка токена
-        //OAuth2TokenStorage.shared.token = nil
     }
     
     //MARK: - Setup Views
@@ -72,7 +66,6 @@ final class SplashViewController: UIViewController {
     
     private func checkAuthenticationState() {
         if let token = storage.token {
-            //
             switchToTabBarController()
             fetchProfile(token: token)
         } else {
@@ -110,7 +103,7 @@ final class SplashViewController: UIViewController {
 extension SplashViewController: AuthViewControllerDelegate {
     func didAuthenticate(_ vc: AuthViewController) {
         vc.dismiss(animated: true)
-        //
+        
         guard let token = storage.token else { return }
         fetchProfile(token: token)
     }
