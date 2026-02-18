@@ -82,7 +82,7 @@ final class SplashViewController: UIViewController {
         
             switch result {
             case let .success(profile):
-                ProfileImageService.shared.fetchProfileImageURL(username: profile.username) {_ in
+                ProfileImageService.shared.fetchProfileImageURL(username: profile.username) { result in
                     switch result {
                     case .success(let url):
                         print("[SplashViewController]: ProfileImageService success - URL: \(url)")

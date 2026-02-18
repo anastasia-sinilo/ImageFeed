@@ -49,7 +49,7 @@ final class ImagesListViewController: UIViewController {
                 let viewController = segue.destination as? SingleImageViewController,
                 let indexPath = sender as? IndexPath
             else {
-                print("Invalid segue destination")
+                print("[ImagesListViewController]: invalid segue destination")
                 return
             }
             let photo = photos[indexPath.row]
