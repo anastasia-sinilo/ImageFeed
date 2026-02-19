@@ -47,23 +47,25 @@ final class SingleImageViewController: UIViewController, UIScrollViewDelegate {
         UIBlockingProgressHUD.show()
         
         imageView.kf.setImage(with: imageURL) { [weak self] result in
-            guard let self else { return }
-            
-            UIBlockingProgressHUD.dismiss()
-            
-            switch result {
-            case .success(let imageResult):
-                let image = imageResult.image
+            DispatchQueue.main.async {
+                UIBlockingProgressHUD.dismiss()
                 
-                self.imageView.image = image
-                self.imageView.frame = CGRect(origin: .zero, size: image.size)
-                self.scrollView.contentSize = image.size
+                guard let self else { return }
                 
-                self.rescaleAndCenterImageInScrollView(image: imageResult.image)
-                
-            case .failure(let error):
-                print("[SingleImageViewController.loadImage]: \(error)")
-                self.showError()
+                switch result {
+                case .success(let imageResult):
+                    let image = imageResult.image
+                    
+                    self.imageView.image = image
+                    self.imageView.frame = CGRect(origin: .zero, size: image.size)
+                    self.scrollView.contentSize = image.size
+                    
+                    self.rescaleAndCenterImageInScrollView(image: imageResult.image)
+                    
+                case .failure(let error):
+                    print("[SingleImageViewController.loadImage]: \(error)")
+                    self.showError()
+                }
             }
         }
     }

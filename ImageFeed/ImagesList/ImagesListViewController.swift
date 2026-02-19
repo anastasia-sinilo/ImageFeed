@@ -158,9 +158,7 @@ extension ImagesListViewController {
         cell.cellImage.kf.indicatorType = .activity
         
         if let url = URL(string: photo.smallImageURL) {
-            cell.cellImage.kf.setImage(with: url, placeholder: placeholder) { [weak self] _ in
-                guard let self else { return }
-                self.tableView.reloadRows(at: [indexPath], with: .automatic)}
+            cell.cellImage.kf.setImage(with: url, placeholder: placeholder)
         } else {
             cell.cellImage.image = placeholder
         }
@@ -180,19 +178,22 @@ extension ImagesListViewController: ImageListCellDelegate {
         UIBlockingProgressHUD.show()
         
         imagesListService.changeLike(photoId: photo.id, isLike: !photo.isLiked) { [weak self] result in
-            guard let self else { return }
-            
-            switch result {
-            case .success:
-                self.photos = self.imagesListService.photos
-                cell.setIsLiked(self.photos[indexPath.row].isLiked)
+            DispatchQueue.main.async {
                 UIBlockingProgressHUD.dismiss()
                 
-            case .failure(let error):
-                UIBlockingProgressHUD.dismiss()
-                print("[ImagesListViewController.imageListCellDidTapLike]: \(error)")
-                // TODO: показать UIAlertController
+                guard let self else { return }
+                
+                switch result {
+                case .success:
+                    self.photos = self.imagesListService.photos
+                    cell.setIsLiked(self.photos[indexPath.row].isLiked)
+                    
+                case .failure(let error):
+                    print("[ImagesListViewController.imageListCellDidTapLike]: \(error)")
+                    // TODO: показать UIAlertController
+                }
             }
+            
         }
     }
 }
