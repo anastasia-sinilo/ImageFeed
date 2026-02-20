@@ -186,7 +186,8 @@ extension ImagesListViewController: ImageListCellDelegate {
                 switch result {
                 case .success:
                     self.photos = self.imagesListService.photos
-                    cell.setIsLiked(self.photos[indexPath.row].isLiked)
+                    self.tableView.reloadRows(at: [indexPath], with: .automatic)
+                    //self.tableView.reloadData()
                     
                 case .failure(let error):
                     print("[ImagesListViewController.imageListCellDidTapLike]: \(error)")

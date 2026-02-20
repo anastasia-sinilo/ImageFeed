@@ -18,6 +18,8 @@ final class ImagesListService {
     private var isFetching = false
     private var task: URLSessionTask?
     
+    private var isChangingLike = false
+    
     //MARK: - API and Request Builders
     
     func fetchPhotosNextPage() {
@@ -77,16 +79,23 @@ final class ImagesListService {
 
 extension ImagesListService {
     func changeLike(photoId: String, isLike: Bool, _ completion: @escaping (Result<Void, Error>) -> Void) {
+        
+        guard !isChangingLike else { return }
+            isChangingLike = true
+        
         guard let request = makeLikeRequest(photoId: photoId, isLike: isLike) else {
+            isChangingLike = false
             completion(.failure(NetworkError.invalidRequest))
             return
         }
         let task = URLSession.shared.objectTask(for: request) { [weak self] (result: Result<LikePhotoResult, Error>) in
             guard let self else { return }
             
-            switch result {
-            case .success:
-                DispatchQueue.main.async {
+            DispatchQueue.main.async {
+                self.isChangingLike = false
+                
+                switch result {
+                case .success:
                     if let index = self.photos.firstIndex(where: { $0.id == photoId }) {
                         let photo = self.photos[index]
                         
@@ -109,10 +118,9 @@ extension ImagesListService {
                         )
                     }
                     completion(.success(()))
-                }
-            case .failure(let error):
-                DispatchQueue.main.async {
-                    completion(.failure(error))
+                    
+                case .failure(let error):
+                        completion(.failure(error))
                 }
             }
         }
