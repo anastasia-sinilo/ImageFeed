@@ -4,7 +4,7 @@ import Foundation
 
 struct UserResult: Codable {
     let profileImage: ProfileImage
-
+    
     private enum CodingKeys: String, CodingKey {
         case profileImage = "profile_image"
     }
@@ -30,24 +30,24 @@ final class ProfileImageService {
     //MARK: - Notifications
     
     static let didChangeNotification = Notification.Name(rawValue: "ProfileImageProviderDidChange")
-        
+    
     //MARK: - API
-
+    
     func fetchProfileImageURL(username: String, completion: @escaping (Result<String, Error>) -> Void) {
         assert(Thread.isMainThread)
         
         task?.cancel()
-
+        
         guard let token = storage.token else {
             completion(.failure(URLError(.userAuthenticationRequired)))
             return
         }
-
+        
         guard let request = makeProfileImageRequest(username: username, token: token) else {
             completion(.failure(URLError(.badURL)))
             return
         }
-
+        
         let task = URLSession.shared.objectTask(for: request) { [weak self] (result: Result<UserResult, Error>) in
             guard let self else { return }
             switch result {
@@ -79,5 +79,13 @@ final class ProfileImageService {
         request.httpMethod = "GET"
         request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         return request
+    }
+}
+
+extension ProfileImageService {
+    func clean() {
+        avatarURL = nil
+        task?.cancel()
+        task = nil
     }
 }

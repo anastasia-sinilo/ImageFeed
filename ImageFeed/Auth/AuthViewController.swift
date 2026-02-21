@@ -7,6 +7,8 @@ protocol AuthViewControllerDelegate: AnyObject {
     func didAuthenticate(_ vc: AuthViewController)
 }
 
+//MARK: -
+
 final class AuthViewController: UIViewController {
     
     private let showWebViewSegueIdentifier = "ShowWebView"
@@ -37,7 +39,7 @@ final class AuthViewController: UIViewController {
         }
     }
     
-    //MARK: - Private Methods
+    //MARK: - UI Config
     
     private func configureBackButton() {
         navigationController?.navigationBar.backIndicatorImage = UIImage(resource: .navBackButton)
@@ -51,7 +53,6 @@ final class AuthViewController: UIViewController {
 
 extension AuthViewController: WebViewViewControllerDelegate {
     func webViewViewController(_ vc: WebViewViewController, didAuthenticateWithCode code: String) {
-        //
         vc.dismiss(animated: true)
         UIBlockingProgressHUD.show()
         
@@ -69,7 +70,7 @@ extension AuthViewController: WebViewViewControllerDelegate {
             }
         }
     }
-
+    
     func webViewViewControllerDidCancel(_ vc: WebViewViewController) {
         vc.dismiss(animated: true)
     }
@@ -83,6 +84,8 @@ extension AuthViewController {
             completion(result)
         }
     }
+    
+    //MARK: - Alerts
     
     private func showAuthErrorAlert() {
         let alert = UIAlertController(
