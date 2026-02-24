@@ -55,7 +55,7 @@ final class ImagesListService {
     }
     
     private func makePhotosRequest(page: Int) -> URLRequest? {
-        guard let baseURL = Constants.defaultBaseURL else { return nil }
+        guard let baseURL = URL(string: AuthConfiguration.standard.defaultBaseURLString) else { return nil }
         
         var urlComponents = URLComponents(url: baseURL.appendingPathComponent("photos"), resolvingAgainstBaseURL: true)
         urlComponents?.queryItems = [
@@ -128,7 +128,7 @@ extension ImagesListService {
     }
     
     private func makeLikeRequest(photoId: String, isLike: Bool) -> URLRequest? {
-        guard let baseURL = Constants.defaultBaseURL else { return nil }
+        guard let baseURL = URL(string: AuthConfiguration.standard.defaultBaseURLString) else { return nil }
         
         let url = baseURL
             .appendingPathComponent("photos")
