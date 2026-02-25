@@ -1,6 +1,15 @@
 import Foundation
 
-final class ImagesListService {
+protocol ImagesListServiceProtocol: AnyObject {
+    var photos: [Photo] { get }
+    
+    func fetchPhotosNextPage()
+    
+    func changeLike(photoId: String, isLike: Bool, _ completion: @escaping (Result<Void, Error>) -> Void
+    )
+}
+
+final class ImagesListService: ImagesListServiceProtocol {
     
     //MARK: - Singleton
     static let shared = ImagesListService()

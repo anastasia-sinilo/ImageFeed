@@ -4,12 +4,12 @@ import UIKit
 final class ImagesListPresenter: ImagesListPresenterProtocol {
     weak var view: ImagesListViewControllerProtocol?
     
-    private let imagesListService: ImagesListService
+    private let imagesListService: ImagesListServiceProtocol
     private var imagesListServiceObserver: NSObjectProtocol?
     
     private var photos: [Photo] = []
     
-    init(imagesListService: ImagesListService = .shared) {
+    init(imagesListService: ImagesListServiceProtocol = ImagesListService.shared) {
             self.imagesListService = imagesListService
         }
         
@@ -50,11 +50,23 @@ final class ImagesListPresenter: ImagesListPresenterProtocol {
         photos.count
     }
     
+    /*
     func photo(at indexPath: IndexPath) -> Photo {
         photos[indexPath.row]
     }
+    */
+    func photo(at indexPath: IndexPath) -> Photo {
+        guard indexPath.row < photos.count
+        else {
+            assertionFailure("Index out of range in photo(at:)")
+            return photos.last!
+        }
+        return photos[indexPath.row]
+    }
     
     func didTapLike(at indexPath: IndexPath) {
+        guard indexPath.row < photos.count else { return }
+            
         let photo = photos[indexPath.row]
         
         UIBlockingProgressHUD.show()

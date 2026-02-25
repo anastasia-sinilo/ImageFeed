@@ -33,6 +33,7 @@ final class ImagesListViewController: UIViewController {
         }
         
         setupTableView()
+    
         presenter?.viewDidLoad()
     }
     
