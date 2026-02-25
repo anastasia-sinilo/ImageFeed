@@ -21,9 +21,24 @@ final class ProfileTests: XCTestCase {
     //MARK: - Update Profile
     
     func testPresenterCallsUpdateProfile() {
-        let presenter = ProfileViewPresenter()
-        let viewSpy = ProfileViewControllerSpy()
-        presenter.view = viewSpy
+        let profile = Profile(
+                username: "test",
+                name: "Test Name",
+                loginName: "Test Login",
+                bio: "Bio"
+            )
+
+            let profileServiceSpy = ProfileServiceSpy()
+            profileServiceSpy.profile = profile
+
+            let presenter = ProfileViewPresenter(
+                profileService: profileServiceSpy
+            )
+
+            let viewSpy = ProfileViewControllerSpy()
+            presenter.view = viewSpy
+
+        
         
         presenter.viewDidLoad()
         

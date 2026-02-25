@@ -3,14 +3,14 @@ import Foundation
 final class ProfileViewPresenter: ProfileViewPresenterProtocol {
     weak var view: ProfileViewControllerProtocol?
     
-    private let profileService: ProfileService
+    private let profileService: ProfileServiceProtocol
     private let profileImageService: ProfileImageService
     private let logoutService: ProfileLogoutService
     
     private var profileImageServiceObserver: NSObjectProtocol?
     
     init(
-        profileService: ProfileService = .shared,
+        profileService: ProfileServiceProtocol = ProfileService.shared,
         profileImageService: ProfileImageService = .shared,
         logoutService: ProfileLogoutService = .shared
     ) {
