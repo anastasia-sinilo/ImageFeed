@@ -6,17 +6,17 @@ final class WebViewTests: XCTestCase {
     @MainActor
     func testViewControllerCallsViewDidLoad() {
         //given
-        //let storyboard = UIStoryboard(name: "Main", bundle: nil)
-        //let viewController = storyboard.instantiateViewController(withIdentifier: "WebViewViewController") as! WebViewViewController
+        let storyboard = UIStoryboard(name: "Main", bundle: nil)
+        let viewController = storyboard.instantiateViewController(withIdentifier: "WebViewViewController") as! WebViewViewController
         
-        let viewController = WebViewViewController()
+        //let viewController = WebViewViewController()
         let presenter = WebViewPresenterSpy()
         viewController.presenter = presenter
         presenter.view = viewController
         
         //when
-       // _ = viewController.view
-        viewController.loadViewIfNeeded()
+        _ = viewController.view
+        //viewController.loadViewIfNeeded()
         //then
         XCTAssertTrue(presenter.viewDidLoadCalled)
     }

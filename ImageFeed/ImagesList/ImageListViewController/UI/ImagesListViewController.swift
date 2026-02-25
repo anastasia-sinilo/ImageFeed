@@ -13,7 +13,6 @@ final class ImagesListViewController: UIViewController {
     
     //MARK: - Properties
     
-   // private var photos: [Photo] = []
     private let showSingleImageSegueIdentifier = "ShowSingleImage"
     private let placeholder = UIImage(resource: .photoPlaceholder)
     private lazy var dateFormatter: DateFormatter = {

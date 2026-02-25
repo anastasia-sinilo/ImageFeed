@@ -36,12 +36,8 @@ final class WebViewViewController: UIViewController, WebViewViewControllerProtoc
                  self.presenter?.didUpdateProgressValue(self.webView.estimatedProgress)
              })
          */
-        estimatedProgressObservation = webView.observe(
-            \.estimatedProgress,
-             options: [.new]
-        ) { [weak self] webView, _ in
-            self?.presenter?.didUpdateProgressValue(webView.estimatedProgress)
-        }
+        setupProgressObserver()
+        
         webView.navigationDelegate = self
         presenter?.viewDidLoad()
     }
@@ -59,6 +55,14 @@ final class WebViewViewController: UIViewController, WebViewViewControllerProtoc
     }
     
     //MARK: -
+    func setupProgressObserver() {
+        estimatedProgressObservation = webView.observe(
+            \.estimatedProgress,
+             options: [.new]
+        ) { [weak self] webView, _ in
+            self?.presenter?.didUpdateProgressValue(webView.estimatedProgress)
+        }
+    }
     
     func load(request: URLRequest) {
         webView.load(request)
