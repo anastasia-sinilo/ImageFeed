@@ -3,46 +3,62 @@ import XCTest
 
 final class WebViewTests: XCTestCase {
     
+    private var presenter: WebViewPresenter!
+    private var presenterSpy: WebViewPresenterSpy!
+    private var viewControllerSpy: WebViewViewControllerSpy!
+    private var authHelper: AuthHelper!
+    
+    override func setUp() {
+         super.setUp()
+         authHelper = AuthHelper()
+     }
+     
+     override func tearDown() {
+         presenter = nil
+         presenterSpy = nil
+         viewControllerSpy = nil
+         authHelper = nil
+         super.tearDown()
+     }
+    
     @MainActor
     func testViewControllerCallsViewDidLoad() {
         //given
         let storyboard = UIStoryboard(name: "Main", bundle: nil)
         let viewController = storyboard.instantiateViewController(withIdentifier: "WebViewViewController") as! WebViewViewController
         
-        //let viewController = WebViewViewController()
-        let presenter = WebViewPresenterSpy()
-        viewController.presenter = presenter
-        presenter.view = viewController
+        presenterSpy = WebViewPresenterSpy()
+        viewController.presenter = presenterSpy
+        presenterSpy.view = viewController
         
         //when
         _ = viewController.view
-        //viewController.loadViewIfNeeded()
+        
         //then
-        XCTAssertTrue(presenter.viewDidLoadCalled)
+        XCTAssertTrue(presenterSpy.viewDidLoadCalled)
     }
      
     @MainActor
     func testPresenterCallsLoadRequest() {
         //given
-        let viewController = WebViewViewControllerSpy()
-        let authHelper = AuthHelper()
-        let presenter = WebViewPresenter(authHelper: authHelper)
+
+        viewControllerSpy = WebViewViewControllerSpy()
+        presenter = WebViewPresenter(authHelper: authHelper)
         
-        viewController.presenter = presenter
-        presenter.view = viewController
+        viewControllerSpy.presenter = presenter
+        presenter.view = viewControllerSpy
         
         //when
         presenter.viewDidLoad()
         
         //then
-        XCTAssertTrue(viewController.loadRequestCalled)
+        XCTAssertTrue(viewControllerSpy.loadRequestCalled)
     }
     
     @MainActor
     func testProgressVisibleWhenLessThenOne() {
         //given
-        let authHelper = AuthHelper()
-        let presenter = WebViewPresenter(authHelper: authHelper)
+        presenter = WebViewPresenter(authHelper: authHelper)
         let progress: Float = 0.6
         
         //when
@@ -55,12 +71,11 @@ final class WebViewTests: XCTestCase {
     @MainActor
     func testProgressHiddenWhenOne() {
         //given
-        let authHelper = AuthHelper() //Dummy
-        let presenter = WebViewPresenter(authHelper: authHelper)
+        presenter = WebViewPresenter(authHelper: authHelper)
         let progress: Float = 1.0
         
         //when
-        let shouldHideProgress = presenter.shouldHideProgress(for: progress) // return value verification
+        let shouldHideProgress = presenter.shouldHideProgress(for: progress)
         
         //then
         XCTAssertTrue(shouldHideProgress)

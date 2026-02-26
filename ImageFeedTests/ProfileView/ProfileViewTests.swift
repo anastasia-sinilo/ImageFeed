@@ -22,27 +22,29 @@ final class ProfileTests: XCTestCase {
     
     func testPresenterCallsUpdateProfile() {
         let profile = Profile(
-                username: "test",
-                name: "Test Name",
-                loginName: "Test Login",
-                bio: "Bio"
-            )
-
-            let profileServiceSpy = ProfileServiceSpy()
-            profileServiceSpy.profile = profile
-
-            let presenter = ProfileViewPresenter(
-                profileService: profileServiceSpy
-            )
-
-            let viewSpy = ProfileViewControllerSpy()
-            presenter.view = viewSpy
-
+            username: "test",
+            name: "Test Name",
+            loginName: "Test Login",
+            bio: "Bio"
+        )
         
+        let profileServiceSpy = ProfileServiceSpy()
+        profileServiceSpy.profile = profile
+        
+        let presenter = ProfileViewPresenter(
+            profileService: profileServiceSpy
+        )
+        
+        let viewSpy = ProfileViewControllerSpy()
+        presenter.view = viewSpy
         
         presenter.viewDidLoad()
         
         XCTAssertTrue(viewSpy.updateProfileCalled)
+        XCTAssertTrue(viewSpy.updateProfileCalled)
+        XCTAssertEqual(viewSpy.receivedName, "Test Name")
+        XCTAssertEqual(viewSpy.receivedLogin, "Test Login")
+        XCTAssertEqual(viewSpy.receivedDescription, "Bio")
     }
     
     //MARK: - Update Avatar

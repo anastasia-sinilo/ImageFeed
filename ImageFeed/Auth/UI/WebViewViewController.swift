@@ -27,15 +27,7 @@ final class WebViewViewController: UIViewController, WebViewViewControllerProtoc
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        /*
-        estimatedProgressObservation = webView.observe(
-            \.estimatedProgress,
-             options: [],
-             changeHandler: { [weak self] _, _ in
-                 guard let self else { return }
-                 self.presenter?.didUpdateProgressValue(self.webView.estimatedProgress)
-             })
-         */
+        
         setupProgressObserver()
         
         webView.navigationDelegate = self

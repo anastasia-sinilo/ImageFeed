@@ -3,7 +3,7 @@ import XCTest
 
 final class ImagesListTests: XCTestCase {
     
-   //MARK: - View - Presenter
+    //MARK: - View - Presenter
     
     @MainActor
     func testViewControllerCallsPresenterViewDidLoad() {
@@ -64,9 +64,9 @@ final class ImagesListTests: XCTestCase {
         presenter.viewDidLoad()
         
         NotificationCenter.default.post(
-                name: ImagesListService.didChangeNotification,
-                object: serviceSpy
-            )
+            name: ImagesListService.didChangeNotification,
+            object: serviceSpy
+        )
         
         presenter.didTapLike(at: IndexPath(row: 0, section: 0))
         
