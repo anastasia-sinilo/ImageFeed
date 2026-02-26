@@ -120,6 +120,7 @@
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="vKn-be-7A4">
                                 <rect key="frame" x="16" y="750" width="408" height="48"/>
                                 <color key="backgroundColor" name="White"/>
+                                <accessibility key="accessibilityConfiguration" identifier="Authenticate"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="48" id="ktL-LQ-sVH"/>
                                 </constraints>

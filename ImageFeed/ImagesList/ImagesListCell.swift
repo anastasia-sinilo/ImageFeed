@@ -31,6 +31,13 @@ final class ImagesListCell: UITableViewCell {
         : UIImage(resource: .likeButtonOff)
         
         likeButton.setImage(likeImage, for: .normal)
+        
+        likeButton.accessibilityIdentifier = "likeButton"
+        /*
+        likeButton.accessibilityIdentifier = isLiked
+                ? "likeButtonOn"
+                : "likeButtonOff"
+         */
     }
     
     //MARK: - IBActions

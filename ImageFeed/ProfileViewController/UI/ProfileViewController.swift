@@ -62,6 +62,7 @@ final class ProfileViewController: UIViewController, ProfileViewControllerProtoc
     }
     
     private func setupNameLabel() {
+        nameLabel.accessibilityIdentifier = "nameLabel"
         nameLabel.text = ""
         nameLabel.textColor = UIColor(resource: .white)
         nameLabel.font = .systemFont(ofSize: 23, weight: .bold)
@@ -70,6 +71,7 @@ final class ProfileViewController: UIViewController, ProfileViewControllerProtoc
     }
     
     private func setupLoginLabel() {
+        loginLabel.accessibilityIdentifier = "loginLabel"
         loginLabel.text = ""
         loginLabel.textColor = UIColor(resource: .gray)
         loginLabel.font = .systemFont(ofSize: 13, weight: .regular)
@@ -86,6 +88,7 @@ final class ProfileViewController: UIViewController, ProfileViewControllerProtoc
     }
     
     private func setupLogoutButton() {
+        logoutButton.accessibilityIdentifier = "profileLogoutButton"
         let image = UIImage(resource: .logoutButton)
         logoutButton.setImage(image, for: .normal)
         logoutButton.tintColor = UIColor(resource: .red)

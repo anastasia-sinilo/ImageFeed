@@ -1,4 +1,5 @@
 import UIKit
+import WebKit
 
 final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
@@ -6,6 +7,20 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
         guard let scene = scene as? UIWindowScene else { return }
+        
+        if ProcessInfo.processInfo.arguments.contains("ResetDataForTests") {
+            OAuth2TokenStorage.shared.token = nil
+            ProfileLogoutService.shared.logout()
+            
+            let datastore = WKWebsiteDataStore.default()
+            datastore.fetchDataRecords(ofTypes: WKWebsiteDataStore.allWebsiteDataTypes()) { records in
+                datastore.removeData(
+                    ofTypes: WKWebsiteDataStore.allWebsiteDataTypes(),
+                    for: records,
+                    completionHandler: {} )
+            }
+        }
+        
         window = UIWindow(windowScene: scene)
         window?.rootViewController = SplashViewController()
         window?.makeKeyAndVisible()
