@@ -1,6 +1,15 @@
 import Foundation
 
-final class ImagesListService {
+protocol ImagesListServiceProtocol: AnyObject {
+    var photos: [Photo] { get }
+    
+    func fetchPhotosNextPage()
+    
+    func changeLike(photoId: String, isLike: Bool, _ completion: @escaping (Result<Void, Error>) -> Void
+    )
+}
+
+final class ImagesListService: ImagesListServiceProtocol {
     
     //MARK: - Singleton
     static let shared = ImagesListService()
@@ -55,7 +64,7 @@ final class ImagesListService {
     }
     
     private func makePhotosRequest(page: Int) -> URLRequest? {
-        guard let baseURL = Constants.defaultBaseURL else { return nil }
+        guard let baseURL = URL(string: AuthConfiguration.standard.defaultBaseURLString) else { return nil }
         
         var urlComponents = URLComponents(url: baseURL.appendingPathComponent("photos"), resolvingAgainstBaseURL: true)
         urlComponents?.queryItems = [
@@ -128,7 +137,7 @@ extension ImagesListService {
     }
     
     private func makeLikeRequest(photoId: String, isLike: Bool) -> URLRequest? {
-        guard let baseURL = Constants.defaultBaseURL else { return nil }
+        guard let baseURL = URL(string: AuthConfiguration.standard.defaultBaseURLString) else { return nil }
         
         let url = baseURL
             .appendingPathComponent("photos")
